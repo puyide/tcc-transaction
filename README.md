@@ -47,3 +47,33 @@ tcc-transaction不和底层使用的rpc框架耦合，也就是使用doubbo,thri
 在运行sample前，需搭建好db环境，运行dbscripts目录下的create_db.sql建立数据库实例及表；还需修改各种项目中jdbc.properties文件中的jdbc连接信息。
 
 如有问题可以在本项目的github issues中提问。或是加微信:changmingxie，为便于识别，麻烦在备注中写下 在tcc-transaction中声明一个tcc的方法时需要加的注解类的名字，作者尽量回答疑问。 
+
+集群配置例子：
+<bean id="transactionRepository" class="org.mengyun.tcctransaction.repository.RedisClusterTransactionRepository">
+<property name="keyPrefix" value="tcc_ut_"/>
+<property name="jedisPool" ref="jedisCluster"/>
+</bean>
+
+ <bean id="genericObjectPoolConfig" class="org.apache.commons.pool2.impl.GenericObjectPoolConfig">
+        <property name="maxTotal"  value="${redis.maxActive}" />
+        <property name="maxIdle"   value="${redis.maxIdle}" />
+        <property name="maxWaitMillis" value="${redis.maxWaitMillis}" />
+        <property name="testOnBorrow" value="${redis.testOnBorrow}"/>
+    </bean>
+
+    <!-- jedisCluster config -->
+    <bean id="jedisCluster" class="redis.clients.jedis.JedisCluster">
+        <constructor-arg index="0">
+            <set>
+                <bean class="redis.clients.jedis.HostAndPort">
+                    <constructor-arg type="String" value="${redis.host1}"/>
+                    <constructor-arg type="int" value="${redis.port1}"/>
+                </bean>
+                <bean class="redis.clients.jedis.HostAndPort">
+                    <constructor-arg type="String" value="${redis.host2}"/>
+                    <constructor-arg type="int" value="${redis.port2}"/>
+                </bean>
+            </set>
+        </constructor-arg>
+        <constructor-arg index="1" ref="genericObjectPoolConfig" />
+    </bean>
