@@ -58,15 +58,10 @@ public class RedisHelper {
         );
     }
 
-    public static byte[] getKeyValue(JedisCluster jedisPool, final byte[] key) {
+    public static byte[] getKeyValue(JedisCluster jedisPool, final byte[] key) {//Cluster 
     	
-        return execute(jedisPool, new JedisClusterCallback<byte[]>() {
-        	
-              
-
-					@Override
-					public byte[] doInJedis(JedisCluster jedis) {
-						 Map<byte[], byte[]> fieldValueMap = jedis.hgetAll(key);
+       
+						 Map<byte[], byte[]> fieldValueMap = jedisPool.hgetAll(key);
 
 	                        List<Map.Entry<byte[], byte[]>> entries = new ArrayList<Map.Entry<byte[], byte[]>>(fieldValueMap.entrySet());
 	                        Collections.sort(entries, new Comparator<Map.Entry<byte[], byte[]>>() {
@@ -82,9 +77,9 @@ public class RedisHelper {
 	                        byte[] content = entries.get(entries.size() - 1).getValue();
 
 	                        return content;
-					}
-                }
-        );
+					
+               
+       
     }
     public static byte[] getKeyValue(Jedis jedis, final byte[] key) {
 
@@ -106,6 +101,7 @@ public class RedisHelper {
         return content;
     }
 
+    
     public static <T> T execute(JedisPool jedisPool, JedisCallback<T> callback) {
         Jedis jedis = null;
         try {
@@ -117,7 +113,8 @@ public class RedisHelper {
             }
         }
     }
-    public static <T> T execute(JedisCluster jedisPool, JedisClusterCallback<T> callback) {
+
+    public static <T> T execute(JedisCluster jedisPool, JedisClusterCallback<T> callback) {//Cluster 
         
         try {
              
